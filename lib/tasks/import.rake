@@ -31,7 +31,7 @@ namespace :geonames do
     end
 
     desc 'Import ALL geonames data.'
-    task :all => [:many, :features]
+    task :all => [:prepare, :countries, :language_codes, :features]
 
     desc 'Import most of geonames data. Recommended after a clean install.'
     task :many => [:prepare, :countries, :cities, :admin1, :admin2]
@@ -145,31 +145,31 @@ namespace :geonames do
       ESCAPE_PROC = ->(val) {
         return val || 'NULL' unless val.is_a?(String)
         return 'NULL'  unless val.length > 0
-        dq = val.gsub(/(^"|"$)/,"")
-        "'#{dq.gsub("'", "''")}'"
+        # dq = val.gsub(/(^"|"$)/,"")
+        "'#{val.gsub("'", "''")}'"
       }
 
-    def casters_for_klass(klass, cols)
-      connection = ActiveRecord::Base.connection
-      cols.inject([]) do |acc, col_name|
-        begin
-          acc << connection.lookup_cast_type_from_column(
-              klass.columns.detect{|c| c.name == col_name.to_s }
-            )  #.type_cast
-        rescue
-          puts col_name.inspect
-          raise 'error'
-        end
+    # def casters_for_klass(klass, cols)
+    #   connection = ActiveRecord::Base.connection
+    #   cols.inject([]) do |acc, col_name|
+    #     begin
+    #       acc << connection.lookup_cast_type_from_column(
+    #           klass.columns.detect{|c| c.name == col_name.to_s }
+    #         )  #.type_cast
+    #     rescue
+    #       puts col_name.inspect
+    #       raise 'error'
+    #     end
 
-        acc
-      end
-    end
+    #     acc
+    #   end
+    # end
 
-    def insert_items(items, cols, klass, caster)
+    def insert_items(items, cols, klass)#, caster)
       query = "insert into #{klass.table_name} (#{cols.join(', ')}) values "
       items.each do |row|
         query << '('
-        row = caster.call(row) do |val|
+        row = row.each do |val|
           ESCAPE_PROC.call(val)
         end
         query << row.join(', ')
@@ -179,7 +179,7 @@ namespace :geonames do
       ActiveRecord::Base.connection.execute query
     end
 
-    def insert_data(file_fd, col_names, main_klass = GeonamesFeature, options = {}, &block)
+    def insert_data(file_fd, col_names, main_klass = GeonamesFeature, options = {})#, &block)
       # Setup nice progress output.
       file_size = file_fd.stat.size
       title = options[:title] || 'Feature Import'
@@ -193,22 +193,22 @@ namespace :geonames do
       # create block array
       # blocks = Geonames::Blocks.new
       loops = 0
-      casters = casters_for_klass(main_klass, col_names)
+      #casters = casters_for_klass(main_klass, col_names)
       col_count = col_names.length
       items = []
       row_prepare = options[:row_prepare]
-      cast_proc = -> (row, &block) { 
-        row.each_with_index.map{ |el, i| 
-          begin
-            val = el #casters[i].type_cast_for_schema(el) 
-          rescue
-            puts val
-            raise "ok"
-          end
-          val = block.call(val) 
-          val
-        }
-      }
+      # cast_proc = -> (row, &block) { 
+      #   row.each_with_index.map{ |el, i| 
+      #     begin
+      #       val = el #casters[i].type_cast_for_schema(el) 
+      #     rescue
+      #       puts val
+      #       raise "ok"
+      #     end
+      #     val = block.call(val) 
+      #     val
+      #   }
+      # }
 
       line_counter = 0
       file_fd.each_line do |line|
@@ -227,14 +227,14 @@ namespace :geonames do
         if line_counter % buffer == 0
           loops += 1
           puts "Insert items #{buffer * loops}."
-          insert_items(items, col_names, main_klass, cast_proc )
+          insert_items(items, col_names, main_klass)#, cast_proc )
           line_counter = 0
           items.clear
         end
         # move progress bar
         progress_bar.progress = file_fd.pos
       end
-      insert_items(items, col_names, main_klass, cast_proc)
+      insert_items(items, col_names, main_klass)#, cast_proc)
     end
 
     def disable_logger
