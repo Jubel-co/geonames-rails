@@ -142,10 +142,12 @@ namespace :geonames do
 
     def quote(row)
       row.map do |val|
-        return val || 'NULL' unless val.is_a?(String)	
-        return 'NULL' unless val.length > 0
-        "'#{val.gsub("'", "''")}'"
-      end
+        if val.is_a?(String) 
+          (val.length > 0) ? "'#{val.gsub("'", "''")}'" : 'NULL'
+        else
+          val || 'NULL'
+        end
+      end 
     end
 
     def insert_items(items, cols, klass)
