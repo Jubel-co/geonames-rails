@@ -167,14 +167,13 @@ namespace :geonames do
 
     def insert_items(items, cols, klass, caster)
       query = "insert into #{klass.table_name} (#{cols.join(', ')}) values "
-      timestamp = DateTime.now
       items.each do |row|
         query << '('
         row = caster.call(row) do |val|
           ESCAPE_PROC.call(val)
         end
         query << row.join(', ')
-        query << ", '#{timestamp}', '#{timestamp}'),"
+        query << '),'
       end
       query.slice!(-1) # remove last ','  
       ActiveRecord::Base.connection.execute query

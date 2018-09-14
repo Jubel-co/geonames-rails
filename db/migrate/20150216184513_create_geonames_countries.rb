@@ -22,7 +22,7 @@ class CreateGeonamesCountries < ActiveRecord::Migration[5.2]
       t.string :neighbours
       t.string :equivalent_fips_code
 
-      t.timestamps
+      t.timestamps null: true
     end
 
     add_index :geonames_countries, :geonameid

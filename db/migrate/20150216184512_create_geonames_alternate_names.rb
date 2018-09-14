@@ -21,7 +21,7 @@ class CreateGeonamesAlternateNames < ActiveRecord::Migration[5.2]
 
       t.string :alternate_name_first_letters
 
-      t.timestamps
+      t.timestamps null: true
     end
 
     add_index :geonames_alternate_names, :alternate_name_id

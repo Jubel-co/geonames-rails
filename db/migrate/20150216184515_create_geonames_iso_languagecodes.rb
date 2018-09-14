@@ -11,7 +11,7 @@ class CreateGeonamesIsoLanguagecodes < ActiveRecord::Migration[5.2]
       t.string :iso_639_1, length: 4
       t.string :language_name, length: 80
 
-      t.timestamps
+      t.timestamps null: true
     end
   end
 end

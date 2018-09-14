@@ -44,7 +44,7 @@ class CreateGeonamesFeatures < ActiveRecord::Migration[5.2]
       t.string :type
       t.string :asciiname_first_letters
 
-      t.timestamps
+      t.timestamps null: true
     end
 
     add_index :geonames_features, :geonameid
