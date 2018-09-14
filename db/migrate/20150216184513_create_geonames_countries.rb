@@ -8,7 +8,7 @@ class CreateGeonamesCountries < ActiveRecord::Migration[5.2]
       t.string :fips
       t.string :country
       t.string :capital
-      t.integer :area # in sq. km
+      t.float :area # in sq. km
       t.integer :population
       t.string :continent
       t.string :tld
