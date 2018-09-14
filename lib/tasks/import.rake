@@ -199,7 +199,7 @@ namespace :geonames do
       cast_proc = -> (row, &block) { 
         row.each_with_index.map{ |el, i| 
           begin
-            val = casters[i].type_cast_for_database(el) 
+            val = casters[i].type_cast_for_schema(el) 
           rescue
             puts val
             raise "ok"
