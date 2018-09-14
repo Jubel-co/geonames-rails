@@ -151,7 +151,7 @@ namespace :geonames do
     def casters_for_klass(klass, cols)
       cols.inject([]) do |acc, col_name|
         begin
-          acc << klass.columns.detect{|c| c.name == col_name.to_s }.cast_type
+          acc << klass.columns.detect{|c| c.name == col_name.to_s }.map {|c| klass.type_for_attribute(c)}
         rescue
           puts col_name.inspect
           raise 'error'
