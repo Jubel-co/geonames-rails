@@ -35,7 +35,7 @@ class CreateGeonamesFeatures < ActiveRecord::Migration[5.2]
       t.string :admin2_code, length: 80
       t.string :admin3_code, length: 20
       t.string :admin4_code, length: 20
-      t.integer :population
+      t.integer :population, limit: 8
       t.integer :elevation
       t.integer :dem
       t.string :timezone, length: 40
