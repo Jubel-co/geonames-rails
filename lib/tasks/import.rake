@@ -34,7 +34,7 @@ namespace :geonames do
     task :all => [:prepare, :countries, :language_codes, :features]
 
     desc 'Import most of geonames data. Recommended after a clean install.'
-    task :many => [:prepare, :countries, :cities, :admin1, :admin2]
+    task :many => [:prepare, :countries, :cities]
 
     desc 'Import all cities, regardless of population.'
     task :cities => [:prepare, :cities15000, :cities5000, :cities1000]
@@ -115,31 +115,31 @@ namespace :geonames do
       end
     end
 
-    desc 'Import admin1 codes'
-    task :admin1 => [:prepare, :environment] do
-      txt_file = get_or_download('http://download.geonames.org/export/dump/admin1CodesASCII.txt')
+    # desc 'Import admin1 codes'
+    # task :admin1 => [:prepare, :environment] do
+    #   txt_file = get_or_download('http://download.geonames.org/export/dump/admin1CodesASCII.txt')
 
-      File.open(txt_file) do |f|
-        prepare = ->(row) {
-          row[0] = row[0].split('.').ljust(2, '')
-          row.flatten
-        }
-        insert_data(f, GEONAMES_ADMINS_COL_NAME, GeonamesAdmin1, title: "Admin1 subdivisions", row_prepare: prepare)
-      end
-    end
+    #   File.open(txt_file) do |f|
+    #     prepare = ->(row) {
+    #       row[0] = row[0].split('.').ljust(2, '')
+    #       row.flatten
+    #     }
+    #     insert_data(f, GEONAMES_ADMINS_COL_NAME, GeonamesAdmin1, title: "Admin1 subdivisions", row_prepare: prepare)
+    #   end
+    # end
 
-    desc 'Import admin2 codes'
-    task :admin2 => [:prepare, :environment] do
-      txt_file = get_or_download('http://download.geonames.org/export/dump/admin2Codes.txt')
+    # desc 'Import admin2 codes'
+    # task :admin2 => [:prepare, :environment] do
+    #   txt_file = get_or_download('http://download.geonames.org/export/dump/admin2Codes.txt')
 
-      File.open(txt_file) do |f|
-        prepare = ->(row) {
-          row[0] = row[0].split('.').ljust(2, '')
-          row.flatten
-        }
-        insert_data(f, GEONAMES_ADMINS2_COL_NAME, GeonamesAdmin2, title: "Admin2 subdivisions", row_prepare: prepare)
-      end
-    end
+    #   File.open(txt_file) do |f|
+    #     prepare = ->(row) {
+    #       row[0] = row[0].split('.').ljust(2, '')
+    #       row.flatten
+    #     }
+    #     insert_data(f, GEONAMES_ADMINS2_COL_NAME, GeonamesAdmin2, title: "Admin2 subdivisions", row_prepare: prepare)
+    #   end
+    # end
 
     def quote(row)
       row.map do |val|
