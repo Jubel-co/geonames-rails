@@ -31,10 +31,10 @@ namespace :geonames do
     end
 
     desc 'Import ALL geonames data.'
-    task :all => [:many]
+    task :all => [:many, :features]
 
     desc 'Import most of geonames data. Recommended after a clean install.'
-    task :many => [:prepare, :countries, :cities15000, :admin1, :admin2]
+    task :many => [:prepare, :countries, :cities, :admin1, :admin2]
 
     desc 'Import all cities, regardless of population.'
     task :cities => [:prepare, :cities15000, :cities5000, :cities1000]
