@@ -168,9 +168,9 @@ namespace :geonames do
       query = "insert into #{klass.table_name} (#{cols.join(', ')}) values " 
       items.each do |row|
         query << '('
-        row = caster.call(row) do |val|
-          ESCAPE_PROC.call(val)
-        end
+        row = caster.call(row) #do |val|
+          #ESCAPE_PROC.call(val)
+        #end
         query << row.join(', ')
         query << '),'
       end
