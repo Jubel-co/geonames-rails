@@ -17,7 +17,7 @@ class GeonamesFeature < ActiveRecord::Base
   ##
   # Search for feature, searches might include country (separated by ',')
   #
-  scope :search, lambda { |query|
+  scope :gnsearch, lambda { |query|
     virgule = query.include? ','
 
     splited = virgule ? query.split(',') : [query]

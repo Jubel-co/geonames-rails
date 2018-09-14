@@ -9,9 +9,9 @@ class GeonamesAlternateName < ActiveRecord::Base
   alias_method :feature, :geonames_feature
 
   ##
-  # default search (by alternate name)
+  # default gnsearch (by alternate name)
   #
-  scope :search, lambda { |q|
+  scope :gnsearch, lambda { |q|
     by_alternate_name_featured(q)
   }
 
