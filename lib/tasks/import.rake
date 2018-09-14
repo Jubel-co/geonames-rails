@@ -141,8 +141,10 @@ namespace :geonames do
     end
 
     def quote(row)
-      row.map do |el|
-        "'#{el.gsub("'", "''")}'"
+      row.map do |val|
+        return val || 'NULL' unless val.is_a?(String)	
+        return 'NULL' unless val.length > 0
+        "'#{val.gsub("'", "''")}'"
       end
     end
 
