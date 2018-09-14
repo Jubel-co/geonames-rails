@@ -145,8 +145,8 @@ namespace :geonames do
       ESCAPE_PROC = ->(val) {
         return val || 'NULL' unless val.is_a?(String)
         return 'NULL'  unless val.length > 0
-        val.gsub("'", "''")
-#        "'#{val.gsub("'", "''")}'"
+        dq = val.gsub(/(^"|"$)/,"")
+        "'#{dq.gsub("'", "''")}'"
       }
 
     def casters_for_klass(klass, cols)
