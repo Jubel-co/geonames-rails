@@ -149,9 +149,12 @@ namespace :geonames do
       }
 
     def casters_for_klass(klass, cols)
+      connection = ActiveRecord::Base.connection
       cols.inject([]) do |acc, col_name|
         begin
-          acc << klass.columns.detect{|c| c.name == col_name.to_s }.type_cast
+          acc << connection.lookup_cast_type_from_column(
+              klass.columns.detect{|c| c.name == col_name.to_s }
+            )  #.type_cast
         rescue
           puts col_name.inspect
           raise 'error'
