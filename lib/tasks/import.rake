@@ -51,15 +51,16 @@ namespace :geonames do
       download_file = ENV['COUNTRY'].present? ? ENV['COUNTRY'].upcase : 'allCountries'
       txt_file = get_or_download("http://download.geonames.org/export/dump/#{download_file}.zip")
       # see http://www.geonames.org/export/codes.html
-      # ALLOWED_FEATURE_CLASS = Set.new(['A', 'P']).freeze
+      allowed_features = ENV['FEATURE_CLASSES'].present? ? ENV['FEATURE_CLASSES'] : 'AHLPRSTUV'
+      ALLOWED_FEATURE_CLASS = Set.new(allowed_features.split(',')).freeze
       FEATURE_CLASS_INDEX   =  6.freeze
       BUFFER                = 1000.freeze
       items = []
-      # filter_proc = ->(row){
-      #   ALLOWED_FEATURE_CLASS.include?(row[FEATURE_CLASS_INDEX])
-      # }
+      filter_proc = ->(row){
+        ALLOWED_FEATURE_CLASS.include?(row[FEATURE_CLASS_INDEX])
+      }
       File.open(txt_file) do |f|
-        insert_data(f, GEONAMES_FEATURES_COL_NAME, GeonamesCity, title: "Features")#, filter: filter_proc)
+        insert_data(f, GEONAMES_FEATURES_COL_NAME, GeonamesCity, title: "Features", filter: filter_proc)
       end
     end
 
