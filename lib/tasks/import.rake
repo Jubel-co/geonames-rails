@@ -63,7 +63,6 @@ namespace :geonames do
       end
     end
 
-
     # geonames:import:citiesNNN where NNN is population size.
     %w[15000 5000 1000].each do |population|
       desc "Import cities with population greater than #{population}"
@@ -141,37 +140,13 @@ namespace :geonames do
       end
     end
 
-    # private
-    #   ESCAPE_PROC = ->(val) {
-    #     return val || 'NULL' unless val.is_a?(String)
-    #     return 'NULL'  unless val.length > 0
-    #     # dq = val.gsub(/(^"|"$)/,"")
-    #     "'#{val.gsub("'", "''")}'"
-    #   }
-
-    # def casters_for_klass(klass, cols)
-    #   connection = ActiveRecord::Base.connection
-    #   cols.inject([]) do |acc, col_name|
-    #     begin
-    #       acc << connection.lookup_cast_type_from_column(
-    #           klass.columns.detect{|c| c.name == col_name.to_s }
-    #         )  #.type_cast
-    #     rescue
-    #       puts col_name.inspect
-    #       raise 'error'
-    #     end
-
-    #     acc
-    #   end
-    # end
-
     def quote(row)
       row.map do |el|
         "'#{el.gsub("'", "''")}'"
       end
     end
 
-    def insert_items(items, cols, klass)#, caster)
+    def insert_items(items, cols, klass)
       query = "insert into #{klass.table_name} (#{cols.join(', ')}) values "
       items.each do |row|
         query << '('
@@ -183,7 +158,7 @@ namespace :geonames do
       ActiveRecord::Base.connection.execute query
     end
 
-    def insert_data(file_fd, col_names, main_klass = GeonamesFeature, options = {})#, &block)
+    def insert_data(file_fd, col_names, main_klass = GeonamesFeature, options = {})
       # Setup nice progress output.
       file_size = file_fd.stat.size
       title = options[:title] || 'Feature Import'
@@ -194,30 +169,12 @@ namespace :geonames do
 
       polymorphic = !main_klass.columns.detect{|c| c.name == 'type' }.nil?
       col_names = col_names  + [ :type ]  if polymorphic
-      # create block array
-      # blocks = Geonames::Blocks.new
       loops = 0
-      #casters = casters_for_klass(main_klass, col_names)
       col_count = col_names.length
       items = []
       row_prepare = options[:row_prepare]
-      # cast_proc = -> (row, &block) { 
-      #   row.each_with_index.map{ |el, i| 
-      #     begin
-      #       val = el #casters[i].type_cast_for_schema(el) 
-      #     rescue
-      #       puts val
-      #       raise "ok"
-      #     end
-      #     val = block.call(val) 
-      #     val
-      #   }
-      # }
-
       line_counter = 0
       file_fd.each_line do |line|
-        # skip comments
-
         next if line.start_with?('#')
         row = line.strip.split("\t")
         row << main_klass.name if polymorphic
@@ -231,14 +188,14 @@ namespace :geonames do
         if line_counter % buffer == 0
           loops += 1
           puts "Insert items #{buffer * loops}."
-          insert_items(items, col_names, main_klass)#, cast_proc )
+          insert_items(items, col_names, main_klass)
           line_counter = 0
           items.clear
         end
         # move progress bar
         progress_bar.progress = file_fd.pos
       end
-      insert_items(items, col_names, main_klass)#, cast_proc)
+      insert_items(items, col_names, main_klass)
     end
 
     def disable_logger
