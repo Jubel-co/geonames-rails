@@ -173,7 +173,7 @@ namespace :geonames do
           ESCAPE_PROC.call(val)
         end
         query << row.join(', ')
-        query << '),'
+        query << ' current_timestamp(), current_timestamp()),'
       end
       query.slice!(-1) # remove last ','  
       ActiveRecord::Base.connection.execute query
