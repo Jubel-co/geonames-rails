@@ -141,13 +141,13 @@ namespace :geonames do
       end
     end
 
-    private
-      ESCAPE_PROC = ->(val) {
-        return val || 'NULL' unless val.is_a?(String)
-        return 'NULL'  unless val.length > 0
-        # dq = val.gsub(/(^"|"$)/,"")
-        "'#{val.gsub("'", "''")}'"
-      }
+    # private
+    #   ESCAPE_PROC = ->(val) {
+    #     return val || 'NULL' unless val.is_a?(String)
+    #     return 'NULL'  unless val.length > 0
+    #     # dq = val.gsub(/(^"|"$)/,"")
+    #     "'#{val.gsub("'", "''")}'"
+    #   }
 
     # def casters_for_klass(klass, cols)
     #   connection = ActiveRecord::Base.connection
@@ -165,13 +165,17 @@ namespace :geonames do
     #   end
     # end
 
+    def quote(row)
+      row.map do |el|
+        "'#{el.gsub("'", "''")}'"
+      end
+    end
+
     def insert_items(items, cols, klass)#, caster)
       query = "insert into #{klass.table_name} (#{cols.join(', ')}) values "
       items.each do |row|
         query << '('
-        row = row.each do |val|
-          ESCAPE_PROC.call(val)
-        end
+        row = quote(row)
         query << row.join(', ')
         query << '),'
       end
